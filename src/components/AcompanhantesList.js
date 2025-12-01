@@ -3,7 +3,6 @@ import {
   ArrowLeft, 
   UserPlus, 
   Search,
-  Filter,
   ArrowUpDown,
   Eye,
   Edit2,
@@ -20,16 +19,8 @@ import '../styles/Acompanhantes.css';
 const AcompanhantesList = ({ onNavigate }) => {
   const [acompanhantes, setAcompanhantes] = useState([]);
   const [filteredAcompanhantes, setFilteredAcompanhantes] = useState([]);
-  const [filters, setFilters] = useState({
-    nome: '',
-    documento: '',
-    responsavel: '',
-    situacao: '',
-    periodoVencendo: false
-  });
   const [sortField, setSortField] = useState('');
   const [sortDirection, setSortDirection] = useState('asc');
-  const [showFilters, setShowFilters] = useState(false);
 
   // Dados mockados dos acompanhantes
   useEffect(() => {
@@ -137,40 +128,6 @@ const AcompanhantesList = ({ onNavigate }) => {
   useEffect(() => {
     let filtered = [...acompanhantes];
 
-    // Aplicar filtros
-    if (filters.nome) {
-      filtered = filtered.filter(a => 
-        `${a.nome} ${a.ultimoNome}`.toLowerCase().includes(filters.nome.toLowerCase())
-      );
-    }
-
-    if (filters.documento) {
-      filtered = filtered.filter(a => 
-        a.documento.includes(filters.documento)
-      );
-    }
-
-    if (filters.responsavel) {
-      filtered = filtered.filter(a => 
-        a.responsavel.nome.toLowerCase().includes(filters.responsavel.toLowerCase()) ||
-        a.responsavel.titulo.includes(filters.responsavel)
-      );
-    }
-
-    if (filters.situacao !== '') {
-      filtered = filtered.filter(a => a.situacao === parseInt(filters.situacao));
-    }
-
-    if (filters.periodoVencendo) {
-      const hoje = new Date();
-      const trintaDias = new Date();
-      trintaDias.setDate(hoje.getDate() + 30);
-      filtered = filtered.filter(a => {
-        const fim = new Date(a.periodoFim);
-        return fim >= hoje && fim <= trintaDias;
-      });
-    }
-
     // Aplicar ordenação
     if (sortField) {
       filtered = filtered.sort((a, b) => {
@@ -195,7 +152,7 @@ const AcompanhantesList = ({ onNavigate }) => {
     }
 
     setFilteredAcompanhantes(filtered);
-  }, [filters, acompanhantes, sortField, sortDirection]);
+  }, [acompanhantes, sortField, sortDirection]);
 
   const handleSort = (field) => {
     if (sortField === field) {
@@ -234,15 +191,6 @@ const AcompanhantesList = ({ onNavigate }) => {
     onNavigate('acompanhante-form', null);
   };
 
-  const clearFilters = () => {
-    setFilters({
-      nome: '',
-      documento: '',
-      responsavel: '',
-      situacao: '',
-      periodoVencendo: false
-    });
-  };
 
   return (
     <div className="acompanhantes-list">
@@ -257,79 +205,6 @@ const AcompanhantesList = ({ onNavigate }) => {
             Novo Acompanhante
           </button>
         </div>
-      </div>
-
-      <div className="filters-section">
-        <div className="filters-header">
-          <button 
-            className="btn-filter-toggle"
-            onClick={() => setShowFilters(!showFilters)}
-          >
-            <Filter size={18} />
-            Filtros
-            {showFilters ? ' ▲' : ' ▼'}
-          </button>
-          {(filters.nome || filters.documento || filters.responsavel || filters.situacao || filters.periodoVencendo) && (
-            <button className="btn-clear-filters" onClick={clearFilters}>
-              Limpar Filtros
-            </button>
-          )}
-        </div>
-
-        {showFilters && (
-          <div className="filters-content">
-            <div className="filter-group">
-              <label>Nome</label>
-              <input
-                type="text"
-                placeholder="Buscar por nome..."
-                value={filters.nome}
-                onChange={(e) => setFilters({ ...filters, nome: e.target.value })}
-              />
-            </div>
-            <div className="filter-group">
-              <label>Documento</label>
-              <input
-                type="text"
-                placeholder="Buscar por documento..."
-                value={filters.documento}
-                onChange={(e) => setFilters({ ...filters, documento: e.target.value })}
-              />
-            </div>
-            <div className="filter-group">
-              <label>Responsável</label>
-              <input
-                type="text"
-                placeholder="Nome ou título do responsável..."
-                value={filters.responsavel}
-                onChange={(e) => setFilters({ ...filters, responsavel: e.target.value })}
-              />
-            </div>
-            <div className="filter-group">
-              <label>Situação</label>
-              <select
-                value={filters.situacao}
-                onChange={(e) => setFilters({ ...filters, situacao: e.target.value })}
-              >
-                <option value="">Todas</option>
-                <option value="1">Ativo</option>
-                <option value="0">Inativo</option>
-                <option value="2">Sem Registro</option>
-                <option value="3">Pendente Pagamento</option>
-              </select>
-            </div>
-            <div className="filter-group">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={filters.periodoVencendo}
-                  onChange={(e) => setFilters({ ...filters, periodoVencendo: e.target.checked })}
-                />
-                Período vencendo (30 dias)
-              </label>
-            </div>
-          </div>
-        )}
       </div>
 
       <div className="table-container">
