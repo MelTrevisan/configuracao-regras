@@ -412,13 +412,12 @@ const AcompanhantesForm = ({ acompanhanteData, onSave, onCancel }) => {
                 <div className="form-group-inline-item">
                   <label className="form-label">Via</label>
                   <input
-                    type="number"
+                    type="text"
                     className="form-input"
                     value={formData.via}
                     onChange={(e) => handleChange('via', e.target.value)}
-                    placeholder="Via do documento (1-99)"
-                    min="1"
-                    max="99"
+                    placeholder="Via (2 caracteres)"
+                    maxLength={2}
                   />
                 </div>
                 <div className="form-group-inline-item">

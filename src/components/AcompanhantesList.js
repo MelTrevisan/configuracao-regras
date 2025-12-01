@@ -3,6 +3,7 @@ import {
   ArrowLeft, 
   UserPlus, 
   Search,
+  Filter,
   ArrowUpDown,
   Eye,
   Edit2,
@@ -12,15 +13,27 @@ import {
   XCircle,
   AlertCircle,
   Clock,
-  User
+  User,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import '../styles/Acompanhantes.css';
 
 const AcompanhantesList = ({ onNavigate }) => {
   const [acompanhantes, setAcompanhantes] = useState([]);
   const [filteredAcompanhantes, setFilteredAcompanhantes] = useState([]);
+  const [filters, setFilters] = useState({
+    nome: '',
+    documento: '',
+    nascimento: '',
+    responsavel: '',
+    periodoIni: '',
+    periodoFim: '',
+    situacao: ''
+  });
   const [sortField, setSortField] = useState('');
   const [sortDirection, setSortDirection] = useState('asc');
+  const [showFilters, setShowFilters] = useState(false);
 
   // Dados mockados dos acompanhantes
   useEffect(() => {
@@ -128,6 +141,48 @@ const AcompanhantesList = ({ onNavigate }) => {
   useEffect(() => {
     let filtered = [...acompanhantes];
 
+    // Aplicar filtros
+    if (filters.nome) {
+      filtered = filtered.filter(a => 
+        `${a.nome} ${a.ultimoNome}`.toLowerCase().includes(filters.nome.toLowerCase())
+      );
+    }
+
+    if (filters.documento) {
+      filtered = filtered.filter(a => 
+        a.documento.includes(filters.documento)
+      );
+    }
+
+    if (filters.nascimento) {
+      filtered = filtered.filter(a => 
+        a.nascimento === filters.nascimento
+      );
+    }
+
+    if (filters.responsavel) {
+      filtered = filtered.filter(a => 
+        a.responsavel.nome.toLowerCase().includes(filters.responsavel.toLowerCase()) ||
+        a.responsavel.titulo.includes(filters.responsavel)
+      );
+    }
+
+    if (filters.periodoIni) {
+      filtered = filtered.filter(a => 
+        a.periodoIni >= filters.periodoIni
+      );
+    }
+
+    if (filters.periodoFim) {
+      filtered = filtered.filter(a => 
+        a.periodoFim <= filters.periodoFim
+      );
+    }
+
+    if (filters.situacao !== '') {
+      filtered = filtered.filter(a => a.situacao === parseInt(filters.situacao));
+    }
+
     // Aplicar ordenação
     if (sortField) {
       filtered = filtered.sort((a, b) => {
@@ -152,7 +207,7 @@ const AcompanhantesList = ({ onNavigate }) => {
     }
 
     setFilteredAcompanhantes(filtered);
-  }, [acompanhantes, sortField, sortDirection]);
+  }, [acompanhantes, filters, sortField, sortDirection]);
 
   const handleSort = (field) => {
     if (sortField === field) {
@@ -191,6 +246,18 @@ const AcompanhantesList = ({ onNavigate }) => {
     onNavigate('acompanhante-form', null);
   };
 
+  const clearFilters = () => {
+    setFilters({
+      nome: '',
+      documento: '',
+      nascimento: '',
+      responsavel: '',
+      periodoIni: '',
+      periodoFim: '',
+      situacao: ''
+    });
+  };
+
 
   return (
     <div className="acompanhantes-list">
@@ -200,11 +267,116 @@ const AcompanhantesList = ({ onNavigate }) => {
             <UserPlus size={24} />
             Acompanhantes
           </h1>
-          <button className="btn-primary" onClick={handleNew}>
-            <Plus size={20} />
-            Novo Acompanhante
-          </button>
+          <div className="header-actions">
+            <button className="btn-primary" onClick={handleNew}>
+              <Plus size={20} />
+              Novo Acompanhante
+            </button>
+          </div>
         </div>
+      </div>
+
+      <div className="filters-section">
+        <div className="filters-header">
+          <button 
+            className="btn-filter-toggle"
+            onClick={() => setShowFilters(!showFilters)}
+          >
+            <Filter size={18} />
+            Filtros
+            {showFilters ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </button>
+          {(filters.nome || filters.documento || filters.nascimento || filters.responsavel || filters.periodoIni || filters.periodoFim || filters.situacao) && (
+            <button className="btn-clear-filters" onClick={clearFilters}>
+              Limpar Filtros
+            </button>
+          )}
+        </div>
+
+        {showFilters && (
+          <div className="filters-content">
+            <div className="filter-row">
+              <div className="filter-group">
+                <label>NOME</label>
+                <input
+                  type="text"
+                  placeholder="Buscar por nome..."
+                  value={filters.nome}
+                  onChange={(e) => setFilters({ ...filters, nome: e.target.value })}
+                />
+              </div>
+              <div className="filter-group">
+                <label>PERÍODO INÍCIO</label>
+                <input
+                  type="date"
+                  value={filters.periodoIni}
+                  onChange={(e) => setFilters({ ...filters, periodoIni: e.target.value })}
+                />
+              </div>
+            </div>
+            <div className="filter-row">
+              <div className="filter-group">
+                <label>DOCUMENTO</label>
+                <input
+                  type="text"
+                  placeholder="Buscar por documento..."
+                  value={filters.documento}
+                  onChange={(e) => setFilters({ ...filters, documento: e.target.value })}
+                />
+              </div>
+              <div className="filter-group">
+                <label>PERÍODO FIM</label>
+                <input
+                  type="date"
+                  value={filters.periodoFim}
+                  onChange={(e) => setFilters({ ...filters, periodoFim: e.target.value })}
+                />
+              </div>
+            </div>
+            <div className="filter-row">
+              <div className="filter-group">
+                <label>NASCIMENTO</label>
+                <input
+                  type="date"
+                  value={filters.nascimento}
+                  onChange={(e) => setFilters({ ...filters, nascimento: e.target.value })}
+                />
+              </div>
+              <div className="filter-group">
+                <label>SITUAÇÃO</label>
+                <select
+                  value={filters.situacao}
+                  onChange={(e) => setFilters({ ...filters, situacao: e.target.value })}
+                >
+                  <option value="">Todas</option>
+                  <option value="1">Ativo</option>
+                  <option value="0">Inativo</option>
+                  <option value="2">Sem Registro</option>
+                  <option value="3">Pendente Pagamento</option>
+                </select>
+              </div>
+            </div>
+            <div className="filter-row">
+              <div className="filter-group">
+                <label>RESPONSÁVEL</label>
+                <input
+                  type="text"
+                  placeholder="Nome ou título do responsável..."
+                  value={filters.responsavel}
+                  onChange={(e) => setFilters({ ...filters, responsavel: e.target.value })}
+                />
+              </div>
+              <div className="filter-group">
+                <label>AÇÕES</label>
+                <div className="filter-actions">
+                  <button className="btn-apply-filters" onClick={() => setShowFilters(false)}>
+                    Aplicar Filtros
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="table-container">
