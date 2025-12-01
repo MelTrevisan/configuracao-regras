@@ -270,6 +270,110 @@ const AcompanhantesList = ({ onNavigate }) => {
         </div>
       </div>
 
+      <div className="filters-section advanced-filters">
+        <div className="filters-header">
+          <div className="filters-title">
+            <Filter size={20} />
+            <span>Filtros Avançados</span>
+          </div>
+          <button className="btn-clear-filters" onClick={handleClearFilters}>
+            Limpar Filtros
+          </button>
+        </div>
+
+        <div className="filters-grid-advanced">
+          <div className="filter-item">
+            <label className="filter-label">NOME:</label>
+            <input
+              type="text"
+              className="filter-input"
+              placeholder="Filtrar por nome..."
+              value={filters.nome}
+              onChange={(e) => handleFilterChange('nome', e.target.value)}
+            />
+          </div>
+
+          <div className="filter-item">
+            <label className="filter-label">DOCUMENTO:</label>
+            <input
+              type="text"
+              className="filter-input"
+              placeholder="Filtrar por documento..."
+              value={filters.documento}
+              onChange={(e) => handleFilterChange('documento', e.target.value)}
+            />
+          </div>
+
+          <div className="filter-item filter-item-range">
+            <label className="filter-label">NASCIMENTO:</label>
+            <div className="range-inputs">
+              <input
+                type="date"
+                className="filter-input"
+                placeholder="dd/mm/aaaa"
+                value={filters.nascimentoInicial}
+                onChange={(e) => handleFilterChange('nascimentoInicial', e.target.value)}
+              />
+              <span className="range-separator">até</span>
+              <input
+                type="date"
+                className="filter-input"
+                placeholder="dd/mm/aaaa"
+                value={filters.nascimentoFinal}
+                onChange={(e) => handleFilterChange('nascimentoFinal', e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="filter-item">
+            <label className="filter-label">RESPONSÁVEL:</label>
+            <input
+              type="text"
+              className="filter-input"
+              placeholder="Filtrar por responsável..."
+              value={filters.responsavel}
+              onChange={(e) => handleFilterChange('responsavel', e.target.value)}
+            />
+          </div>
+
+          <div className="filter-item filter-item-range">
+            <label className="filter-label">PERÍODO:</label>
+            <div className="range-inputs">
+              <input
+                type="date"
+                className="filter-input"
+                placeholder="dd/mm/aaaa"
+                value={filters.periodoIni}
+                onChange={(e) => handleFilterChange('periodoIni', e.target.value)}
+              />
+              <span className="range-separator">até</span>
+              <input
+                type="date"
+                className="filter-input"
+                placeholder="dd/mm/aaaa"
+                value={filters.periodoFim}
+                onChange={(e) => handleFilterChange('periodoFim', e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="filter-item">
+            <label className="filter-label">SITUAÇÃO:</label>
+            <select
+              className="filter-select"
+              value={filters.situacao}
+              onChange={(e) => handleFilterChange('situacao', e.target.value)}
+            >
+              <option value="all">Todas</option>
+              <option value="1">Ativo</option>
+              <option value="0">Inativo</option>
+              <option value="2">Sem Registro</option>
+              <option value="3">Pendente Pagamento</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
       <div className="table-container">
         <table className="data-table">
           <thead>
