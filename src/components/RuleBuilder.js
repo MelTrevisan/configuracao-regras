@@ -419,26 +419,47 @@ const RuleBuilder = ({ onBack, onSave, initialRule = null, availableRules = [] }
       const logicalOperator = condition.logicalOperator || 'AND';
       const conditionText = `${condition.field} ${condition.operator} ${condition.value || 'N/A'}`;
       
-      testResults.push({
-        condition: conditionText,
-        result: conditionResult,
-        fieldValue: fieldValue || 'N/A',
-        logicalOperator: index > 0 ? logicalOperator : null
-      });
+        testResults.push({
+          condition: conditionText,
+          result: conditionResult,
+          fieldValue: fieldValue || 'N/A',
+          logicalOperator: conditionIndex > 0 ? logicalOperator : null,
+          field: field
+        });
 
-      // Aplicar operador lógico
-      if (index === 0) {
-        // Primeira condição - resultado inicial
-        overallResult = conditionResult;
-        previousResult = conditionResult;
-      } else {
-        // Aplicar operador lógico com a condição anterior
-        if (logicalOperator === 'AND') {
-          overallResult = previousResult && conditionResult;
-        } else if (logicalOperator === 'OR') {
-          overallResult = previousResult || conditionResult;
+        // Aplicar operador lógico entre condições do mesmo campo
+        if (conditionIndex === 0) {
+          // Primeira condição do campo - resultado inicial
+          fieldResult = conditionResult;
+          previousConditionResult = conditionResult;
+        } else {
+          // Aplicar operador lógico com a condição anterior do mesmo campo
+          if (logicalOperator === 'AND') {
+            fieldResult = previousConditionResult && conditionResult;
+          } else if (logicalOperator === 'OR') {
+            fieldResult = previousConditionResult || conditionResult;
+          }
+          previousConditionResult = fieldResult;
         }
-        previousResult = overallResult;
+      });
+      
+      fieldResults[field] = fieldResult;
+      
+      // Aplicar operador lógico entre campos diferentes
+      if (fieldIndex === 0) {
+        // Primeiro campo - resultado inicial
+        overallResult = fieldResult;
+      } else {
+        // Aplicar operador lógico com o campo anterior
+        const fieldOperator = fieldOperators[field] || 'AND';
+        const previousField = fieldGroups[fieldIndex - 1];
+        const previousFieldResult = fieldResults[previousField];
+        
+        if (fieldOperator === 'AND') {
+          overallResult = previousFieldResult && fieldResult;
+        } else if (fieldOperator === 'OR') {
+          overallResult = previousFieldResult || fieldResult;
+        }
       }
     });
 
