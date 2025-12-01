@@ -122,6 +122,7 @@ const RulesConfiguration = () => {
         onBack={() => setShowRuleBuilder(false)}
         onSave={handleSaveRule}
         initialRule={selectedRule}
+        availableRules={rules.filter(r => r.status === 'active' && (!selectedRule || r.id !== selectedRule.id))}
       />
     );
   }

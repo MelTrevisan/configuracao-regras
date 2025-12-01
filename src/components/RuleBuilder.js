@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import '../styles/RuleBuilder.css';
 
-const RuleBuilder = ({ onBack, onSave, initialRule = null }) => {
+const RuleBuilder = ({ onBack, onSave, initialRule = null, availableRules = [] }) => {
   const [ruleName, setRuleName] = useState(initialRule?.name || '');
   const [codigoRegra, setCodigoRegra] = useState(initialRule?.codigoRegra || '');
   const [ruleModule, setRuleModule] = useState(initialRule?.module || '');
@@ -29,6 +29,14 @@ const RuleBuilder = ({ onBack, onSave, initialRule = null }) => {
   );
   const [conditionGroups, setConditionGroups] = useState([0]);
   const [showHistory, setShowHistory] = useState(false);
+  
+  // Regras combinadas
+  const [combinedRules, setCombinedRules] = useState(
+    initialRule?.combinedRules || []
+  );
+  const [combinedRulesOperator, setCombinedRulesOperator] = useState(
+    initialRule?.combinedRulesOperator || 'AND'
+  );
   
   // Histórico mockado de alterações
   const [ruleHistory] = useState([
@@ -297,7 +305,9 @@ const RuleBuilder = ({ onBack, onSave, initialRule = null }) => {
       startDate: ruleStartDate,
       validationField: validationField,
       validationValue: validationValue,
-      conditions: validConditions
+      conditions: validConditions,
+      combinedRules: combinedRules,
+      combinedRulesOperator: combinedRulesOperator
     };
 
     onSave(ruleData);
@@ -567,6 +577,103 @@ ${testResults.map((result, index) => {
             </div>
           </div>
         </div>
+
+        {/* Conciliação de Regras */}
+        {availableRules.length > 0 && (
+          <div className="builder-section">
+            <h2 className="section-title">Conciliação de Regras</h2>
+            <p className="section-description">
+              Combine esta regra com outras regras existentes usando operadores lógicos AND ou OR.
+            </p>
+
+            <div className="combined-rules-container">
+              <div className="combined-rules-operator-selector">
+                <label className="form-label">Operador Lógico entre Regras:</label>
+                <div className="logical-buttons-group">
+                  <button
+                    type="button"
+                    className={`logical-btn ${combinedRulesOperator === 'AND' ? 'active' : ''}`}
+                    onClick={() => setCombinedRulesOperator('AND')}
+                    title="Todas as regras devem ser verdadeiras"
+                  >
+                    <span className="logical-btn-text">E</span>
+                    <span className="logical-btn-label">(AND)</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`logical-btn ${combinedRulesOperator === 'OR' ? 'active' : ''}`}
+                    onClick={() => setCombinedRulesOperator('OR')}
+                    title="Pelo menos uma regra deve ser verdadeira"
+                  >
+                    <span className="logical-btn-text">OU</span>
+                    <span className="logical-btn-label">(OR)</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="combined-rules-selection">
+                <label className="form-label">Selecione as Regras para Combinar:</label>
+                <div className="rules-checkbox-list">
+                  {availableRules.map(rule => (
+                    <label key={rule.id} className="rule-checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={combinedRules.some(r => r.id === rule.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setCombinedRules([...combinedRules, {
+                              id: rule.id,
+                              codigoRegra: rule.codigoRegra,
+                              name: rule.name,
+                              module: rule.module
+                            }]);
+                          } else {
+                            setCombinedRules(combinedRules.filter(r => r.id !== rule.id));
+                          }
+                        }}
+                        className="rule-checkbox"
+                      />
+                      <div className="rule-checkbox-info">
+                        <span className="rule-checkbox-code">{rule.codigoRegra || `REG-${rule.id}`}</span>
+                        <span className="rule-checkbox-name">{rule.name}</span>
+                        <span className="rule-checkbox-module">{rule.module}</span>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {combinedRules.length > 0 && (
+                <div className="combined-rules-preview">
+                  <label className="form-label">Regras Selecionadas:</label>
+                  <div className="selected-rules-list">
+                    {combinedRules.map((rule, index) => (
+                      <div key={rule.id} className="selected-rule-item">
+                        <div className="selected-rule-info">
+                          <span className="selected-rule-code">{rule.codigoRegra || `REG-${rule.id}`}</span>
+                          <span className="selected-rule-name">{rule.name}</span>
+                        </div>
+                        {index < combinedRules.length - 1 && (
+                          <span className="selected-rule-operator">
+                            {combinedRulesOperator === 'AND' ? 'E' : 'OU'}
+                          </span>
+                        )}
+                        <button
+                          type="button"
+                          className="remove-rule-btn"
+                          onClick={() => setCombinedRules(combinedRules.filter(r => r.id !== rule.id))}
+                          title="Remover regra"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Seleção de Campos */}
         <div className="builder-section">
