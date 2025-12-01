@@ -160,12 +160,24 @@ function App() {
     }
   };
 
+  const handleSidebarNavigate = (page) => {
+    // Limpar dados quando navegar para uma nova página
+    if (page === 'acompanhantes' || page === 'acompanhante-form' || page === 'acompanhante-detail') {
+      setAcompanhanteData(null);
+    } else if (page === 'clubes-conveniados' || page === 'clubes-conveniados-form' || page === 'clube-conveniado-detail') {
+      setClubeData(null);
+    } else if (page === 'fluxo-solicitacoes' || page === 'fluxo-solicitacoes-form' || page === 'fluxo-solicitacoes-detail') {
+      setFluxoData(null);
+    }
+    setCurrentPage(page);
+  };
+
   return (
     <div className="app">
       <Sidebar 
         collapsed={sidebarCollapsed} 
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-        onNavigate={setCurrentPage}
+        onNavigate={handleSidebarNavigate}
         currentPage={currentPage}
       />
       <div className={`main-content ${sidebarCollapsed ? 'expanded' : ''}`}>

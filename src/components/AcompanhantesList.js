@@ -137,6 +137,7 @@ const AcompanhantesList = ({ onNavigate }) => {
   useEffect(() => {
     let filtered = [...acompanhantes];
 
+    // Aplicar filtros
     if (filters.nome) {
       filtered = filtered.filter(a => 
         `${a.nome} ${a.ultimoNome}`.toLowerCase().includes(filters.nome.toLowerCase())
@@ -170,21 +171,9 @@ const AcompanhantesList = ({ onNavigate }) => {
       });
     }
 
-    setFilteredAcompanhantes(filtered);
-  }, [filters, acompanhantes]);
-
-  const handleSort = (field) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortDirection('asc');
-    }
-  };
-
-  useEffect(() => {
+    // Aplicar ordenação
     if (sortField) {
-      const sorted = [...filteredAcompanhantes].sort((a, b) => {
+      filtered = filtered.sort((a, b) => {
         let aVal = a[sortField];
         let bVal = b[sortField];
 
@@ -203,9 +192,19 @@ const AcompanhantesList = ({ onNavigate }) => {
         }
         return sortDirection === 'asc' ? aVal - bVal : bVal - aVal;
       });
-      setFilteredAcompanhantes(sorted);
     }
-  }, [sortField, sortDirection]);
+
+    setFilteredAcompanhantes(filtered);
+  }, [filters, acompanhantes, sortField, sortDirection]);
+
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
 
   const getSituacaoLabel = (situacao) => {
     const situacoes = {
