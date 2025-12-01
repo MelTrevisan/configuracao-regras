@@ -3,6 +3,7 @@ import {
   ArrowLeft, 
   UserPlus, 
   Search,
+  Filter,
   ArrowUpDown,
   Eye,
   Edit2,
@@ -19,6 +20,16 @@ import '../styles/Acompanhantes.css';
 const AcompanhantesList = ({ onNavigate }) => {
   const [acompanhantes, setAcompanhantes] = useState([]);
   const [filteredAcompanhantes, setFilteredAcompanhantes] = useState([]);
+  const [filters, setFilters] = useState({
+    nome: '',
+    documento: '',
+    nascimentoInicial: '',
+    nascimentoFinal: '',
+    responsavel: '',
+    periodoIni: '',
+    periodoFim: '',
+    situacao: 'all'
+  });
   const [sortField, setSortField] = useState('');
   const [sortDirection, setSortDirection] = useState('asc');
 
@@ -125,8 +136,57 @@ const AcompanhantesList = ({ onNavigate }) => {
     setFilteredAcompanhantes(mockAcompanhantes);
   }, []);
 
+  const handleFilterChange = (field, value) => {
+    setFilters(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleClearFilters = () => {
+    setFilters({
+      nome: '',
+      documento: '',
+      nascimentoInicial: '',
+      nascimentoFinal: '',
+      responsavel: '',
+      periodoIni: '',
+      periodoFim: '',
+      situacao: 'all'
+    });
+  };
+
   useEffect(() => {
-    let filtered = [...acompanhantes];
+    // Aplicar filtros
+    const filtered = acompanhantes.filter(acompanhante => {
+      const matchesNome = !filters.nome || 
+        `${acompanhante.nome} ${acompanhante.ultimoNome}`.toLowerCase().includes(filters.nome.toLowerCase());
+      
+      const matchesDocumento = !filters.documento || 
+        acompanhante.documento.includes(filters.documento);
+      
+      const matchesNascimentoInicial = !filters.nascimentoInicial || 
+        new Date(acompanhante.nascimento) >= new Date(filters.nascimentoInicial);
+      
+      const matchesNascimentoFinal = !filters.nascimentoFinal || 
+        new Date(acompanhante.nascimento) <= new Date(filters.nascimentoFinal);
+      
+      const matchesResponsavel = !filters.responsavel || 
+        acompanhante.responsavel.nome.toLowerCase().includes(filters.responsavel.toLowerCase()) ||
+        acompanhante.responsavel.titulo.includes(filters.responsavel);
+      
+      const matchesPeriodoIni = !filters.periodoIni || 
+        new Date(acompanhante.periodoIni) >= new Date(filters.periodoIni);
+      
+      const matchesPeriodoFim = !filters.periodoFim || 
+        new Date(acompanhante.periodoFim) <= new Date(filters.periodoFim);
+      
+      const matchesSituacao = filters.situacao === 'all' || 
+        acompanhante.situacao === parseInt(filters.situacao);
+
+      return matchesNome && matchesDocumento && matchesNascimentoInicial && matchesNascimentoFinal &&
+        matchesResponsavel && matchesPeriodoIni && matchesPeriodoFim && matchesSituacao;
+    });
 
     // Aplicar ordenação
     if (sortField) {
@@ -152,7 +212,7 @@ const AcompanhantesList = ({ onNavigate }) => {
     }
 
     setFilteredAcompanhantes(filtered);
-  }, [acompanhantes, sortField, sortDirection]);
+  }, [acompanhantes, filters, sortField, sortDirection]);
 
   const handleSort = (field) => {
     if (sortField === field) {
