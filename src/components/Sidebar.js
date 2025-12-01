@@ -12,7 +12,8 @@ import {
   ChevronRight,
   ClipboardList,
   Building2,
-  GitBranch
+  GitBranch,
+  UserPlus
 } from 'lucide-react';
 import '../styles/Sidebar.css';
 
@@ -22,6 +23,7 @@ const Sidebar = ({ collapsed, onToggleCollapse, onNavigate, currentPage }) => {
   const menuItems = [
     { icon: ClipboardList, label: 'Solicitações', section: 'principal', page: 'solicitacoes' },
     { icon: Users, label: 'Associados', section: 'principal', page: 'associados' },
+    { icon: UserPlus, label: 'Acompanhantes', section: 'principal', page: 'acompanhantes' },
     { icon: UserCircle, label: 'Visitantes', section: 'principal', page: 'visitantes' },
     { icon: Users, label: 'Candidatos', section: 'principal', page: 'candidatos' },
     { icon: Building2, label: 'Clubes Conveniados', section: 'principal', page: 'clubes-conveniados' },
@@ -37,6 +39,7 @@ const Sidebar = ({ collapsed, onToggleCollapse, onNavigate, currentPage }) => {
       submenu: [
         { icon: UserCircle, label: 'Visitantes', page: 'cadastros-visitantes' },
         { icon: Users, label: 'Associados', page: 'cadastros-associados' },
+        { icon: UserPlus, label: 'Acompanhantes', page: 'acompanhantes' },
         { icon: Users, label: 'Candidatos', page: 'cadastros-candidatos' },
         { icon: Building2, label: 'Clubes Conveniados', page: 'clubes-conveniados' }
       ]

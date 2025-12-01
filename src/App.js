@@ -10,12 +10,15 @@ import ClubesConveniadosList from './components/ClubesConveniadosList';
 import ClubesConveniadosForm from './components/ClubesConveniadosForm';
 import FluxoSolicitacoesList from './components/FluxoSolicitacoesList';
 import FluxoSolicitacoesForm from './components/FluxoSolicitacoesForm';
+import AcompanhantesList from './components/AcompanhantesList';
+import AcompanhantesForm from './components/AcompanhantesForm';
 
 function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [currentPage, setCurrentPage] = useState('solicitacoes');
   const [clubeData, setClubeData] = useState(null);
   const [fluxoData, setFluxoData] = useState(null);
+  const [acompanhanteData, setAcompanhanteData] = useState(null);
 
   const handleNavigate = (page, data) => {
     if (data) {
@@ -54,6 +57,25 @@ function App() {
   const handleCancelFluxo = () => {
     setCurrentPage('fluxo-solicitacoes');
     setFluxoData(null);
+  };
+
+  const handleNavigateAcompanhante = (page, data) => {
+    if (data) {
+      setAcompanhanteData(data);
+    }
+    setCurrentPage(page);
+  };
+
+  const handleSaveAcompanhante = (data) => {
+    console.log('Salvando acompanhante:', data);
+    alert('Acompanhante salvo com sucesso!');
+    setCurrentPage('acompanhantes');
+    setAcompanhanteData(null);
+  };
+
+  const handleCancelAcompanhante = () => {
+    setCurrentPage('acompanhantes');
+    setAcompanhanteData(null);
   };
 
   const renderPage = () => {
@@ -113,6 +135,24 @@ function App() {
             fluxoData={fluxoData}
             onSave={handleSaveFluxo}
             onCancel={handleCancelFluxo}
+          />
+        );
+      case 'acompanhantes':
+        return <AcompanhantesList onNavigate={handleNavigateAcompanhante} />;
+      case 'acompanhante-form':
+        return (
+          <AcompanhantesForm 
+            acompanhanteData={acompanhanteData}
+            onSave={handleSaveAcompanhante}
+            onCancel={handleCancelAcompanhante}
+          />
+        );
+      case 'acompanhante-detail':
+        return (
+          <AcompanhantesForm 
+            acompanhanteData={acompanhanteData}
+            onSave={handleSaveAcompanhante}
+            onCancel={handleCancelAcompanhante}
           />
         );
       default:
