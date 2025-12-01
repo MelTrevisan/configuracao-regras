@@ -408,29 +408,30 @@ const AcompanhantesForm = ({ acompanhanteData, onSave, onCancel }) => {
                 )}
               </div>
 
-              <div className="form-group">
-                <label className="form-label">Via</label>
-                <input
-                  type="number"
-                  className="form-input"
-                  value={formData.via}
-                  onChange={(e) => handleChange('via', e.target.value)}
-                  placeholder="Via do documento (1-99)"
-                  min="1"
-                  max="99"
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Carteira</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={formData.carteira}
-                  onChange={(e) => handleChange('carteira', e.target.value)}
-                  placeholder="Número da carteira"
-                  maxLength={20}
-                />
+              <div className="form-group form-group-inline">
+                <div className="form-group-inline-item">
+                  <label className="form-label">Via</label>
+                  <input
+                    type="number"
+                    className="form-input"
+                    value={formData.via}
+                    onChange={(e) => handleChange('via', e.target.value)}
+                    placeholder="Via do documento (1-99)"
+                    min="1"
+                    max="99"
+                  />
+                </div>
+                <div className="form-group-inline-item">
+                  <label className="form-label">Carteira</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={formData.carteira}
+                    onChange={(e) => handleChange('carteira', e.target.value)}
+                    placeholder="Número da carteira"
+                    maxLength={20}
+                  />
+                </div>
               </div>
             </div>
           </div>

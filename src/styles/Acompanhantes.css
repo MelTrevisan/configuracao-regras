@@ -361,6 +361,19 @@
   grid-column: 1 / -1;
 }
 
+.form-group-inline {
+  display: flex;
+  gap: 16px;
+  grid-column: 1 / -1;
+}
+
+.form-group-inline-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
 .form-label {
   font-size: 14px;
   font-weight: 500;
