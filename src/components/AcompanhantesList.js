@@ -283,34 +283,31 @@ const AcompanhantesList = ({ onNavigate }) => {
 
         <div className="filters-grid-advanced">
           <div className="filter-item">
-            <label className="filter-label">NOME:</label>
             <input
               type="text"
               className="filter-input"
-              placeholder="Filtrar por nome..."
+              placeholder="NOME"
               value={filters.nome}
               onChange={(e) => handleFilterChange('nome', e.target.value)}
             />
           </div>
 
           <div className="filter-item">
-            <label className="filter-label">DOCUMENTO:</label>
             <input
               type="text"
               className="filter-input"
-              placeholder="Filtrar por documento..."
+              placeholder="DOCUMENTO"
               value={filters.documento}
               onChange={(e) => handleFilterChange('documento', e.target.value)}
             />
           </div>
 
           <div className="filter-item filter-item-range">
-            <label className="filter-label">NASCIMENTO:</label>
             <div className="range-inputs">
               <input
                 type="date"
                 className="filter-input"
-                placeholder="dd/mm/aaaa"
+                placeholder="NASCIMENTO"
                 value={filters.nascimentoInicial}
                 onChange={(e) => handleFilterChange('nascimentoInicial', e.target.value)}
               />
@@ -318,7 +315,7 @@ const AcompanhantesList = ({ onNavigate }) => {
               <input
                 type="date"
                 className="filter-input"
-                placeholder="dd/mm/aaaa"
+                placeholder="NASCIMENTO"
                 value={filters.nascimentoFinal}
                 onChange={(e) => handleFilterChange('nascimentoFinal', e.target.value)}
               />
@@ -326,23 +323,21 @@ const AcompanhantesList = ({ onNavigate }) => {
           </div>
 
           <div className="filter-item">
-            <label className="filter-label">RESPONSÁVEL:</label>
             <input
               type="text"
               className="filter-input"
-              placeholder="Filtrar por responsável..."
+              placeholder="RESPONSÁVEL"
               value={filters.responsavel}
               onChange={(e) => handleFilterChange('responsavel', e.target.value)}
             />
           </div>
 
           <div className="filter-item filter-item-range">
-            <label className="filter-label">PERÍODO:</label>
             <div className="range-inputs">
               <input
                 type="date"
                 className="filter-input"
-                placeholder="dd/mm/aaaa"
+                placeholder="PERÍODO INÍCIO"
                 value={filters.periodoIni}
                 onChange={(e) => handleFilterChange('periodoIni', e.target.value)}
               />
@@ -350,7 +345,7 @@ const AcompanhantesList = ({ onNavigate }) => {
               <input
                 type="date"
                 className="filter-input"
-                placeholder="dd/mm/aaaa"
+                placeholder="PERÍODO FIM"
                 value={filters.periodoFim}
                 onChange={(e) => handleFilterChange('periodoFim', e.target.value)}
               />
@@ -358,13 +353,12 @@ const AcompanhantesList = ({ onNavigate }) => {
           </div>
 
           <div className="filter-item">
-            <label className="filter-label">SITUAÇÃO:</label>
             <select
               className="filter-select"
               value={filters.situacao}
               onChange={(e) => handleFilterChange('situacao', e.target.value)}
             >
-              <option value="all">Todas</option>
+              <option value="all">SITUAÇÃO</option>
               <option value="1">Ativo</option>
               <option value="0">Inativo</option>
               <option value="2">Sem Registro</option>
