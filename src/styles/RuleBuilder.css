@@ -1184,6 +1184,85 @@
   transform: scale(1.1);
 }
 
+/* Operadores Lógicos entre Campos */
+.field-group-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: #fafafa;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+}
+
+.field-logical-operator-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: linear-gradient(135deg, #fff5f5, #ffe5e5);
+  border: 2px solid #d32f2f;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.field-operator-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #d32f2f;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.field-operator-info {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #d32f2f;
+}
+
+.field-operator-text {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+.field-operator-text strong {
+  color: #d32f2f;
+  font-size: 16px;
+  margin: 0 8px;
+}
+
+.field-group-header {
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.field-group-title {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.field-group-name {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.field-group-count {
+  font-size: 13px;
+  font-weight: 400;
+  opacity: 0.9;
+}
+
 .type-value {
   background: #d32f2f;
   color: white;

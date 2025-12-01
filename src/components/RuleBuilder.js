@@ -38,6 +38,11 @@ const RuleBuilder = ({ onBack, onSave, initialRule = null, availableRules = [] }
     initialRule?.combinedRulesOperator || 'AND'
   );
   
+  // Operadores lógicos entre campos
+  const [fieldOperators, setFieldOperators] = useState(
+    initialRule?.fieldOperators || {}
+  );
+  
   // Histórico mockado de alterações
   const [ruleHistory] = useState([
     {
@@ -307,7 +312,8 @@ const RuleBuilder = ({ onBack, onSave, initialRule = null, availableRules = [] }
       validationValue: validationValue,
       conditions: validConditions,
       combinedRules: combinedRules,
-      combinedRulesOperator: combinedRulesOperator
+      combinedRulesOperator: combinedRulesOperator,
+      fieldOperators: fieldOperators
     };
 
     onSave(ruleData);
@@ -348,10 +354,29 @@ const RuleBuilder = ({ onBack, onSave, initialRule = null, availableRules = [] }
 
     // Simular avaliação da regra
     let testResults = [];
+    
+    // Agrupar condições por campo
+    const conditionsByField = {};
+    validConditions.forEach(condition => {
+      if (condition.field) {
+        if (!conditionsByField[condition.field]) {
+          conditionsByField[condition.field] = [];
+        }
+        conditionsByField[condition.field].push(condition);
+      }
+    });
+    
+    const fieldGroups = Object.keys(conditionsByField);
+    let fieldResults = {};
     let overallResult = null;
-    let previousResult = null;
 
-    validConditions.forEach((condition, index) => {
+    // Avaliar cada grupo de campo
+    fieldGroups.forEach((field, fieldIndex) => {
+      const fieldConditions = conditionsByField[field];
+      let fieldResult = null;
+      let previousConditionResult = null;
+
+      fieldConditions.forEach((condition, conditionIndex) => {
       const fieldValue = testData[condition.field];
       let conditionResult = false;
 
@@ -427,17 +452,35 @@ const RuleBuilder = ({ onBack, onSave, initialRule = null, availableRules = [] }
 ${Object.entries(testData).map(([key, value]) => `• ${key}: ${value}`).join('\n')}
 
 🔍 Resultados das Condições:
-${testResults.map((result, index) => {
-  let line = `• Condição ${index + 1}: ${result.condition}
-  Valor atual: ${result.fieldValue}
-  Resultado: ${result.result ? '✅ PASSOU' : '❌ FALHOU'}`;
-  
-  if (result.logicalOperator) {
-    line += `\n  Operador: ${result.logicalOperator === 'AND' ? 'E (AND)' : 'OU (OR)'}`;
-  }
-  
-  return line;
-}).join('\n\n')}
+${(() => {
+  let output = '';
+  let currentField = '';
+  fieldGroups.forEach((field, fieldIndex) => {
+    if (fieldIndex > 0) {
+      const fieldOperator = fieldOperators[field] || 'AND';
+      output += `\n\n━━━ ${fieldGroups[fieldIndex - 1]} ${fieldOperator === 'AND' ? 'E (AND)' : 'OU (OR)'} ${field} ━━━\n\n`;
+    } else {
+      output += `\n━━━ Campo: ${field} ━━━\n\n`;
+    }
+    
+    const fieldConditions = conditionsByField[field];
+    fieldConditions.forEach((condition, conditionIndex) => {
+      const result = testResults.find(r => r.condition.includes(condition.field) && r.condition.includes(condition.operator));
+      if (result) {
+        output += `• ${result.condition}\n`;
+        output += `  Valor atual: ${result.fieldValue}\n`;
+        output += `  Resultado: ${result.result ? '✅ PASSOU' : '❌ FALHOU'}`;
+        if (result.logicalOperator && conditionIndex > 0) {
+          output += `\n  Operador entre condições: ${result.logicalOperator === 'AND' ? 'E (AND)' : 'OU (OR)'}`;
+        }
+        output += '\n\n';
+      }
+    });
+    
+    output += `Resultado do campo ${field}: ${fieldResults[field] ? '✅ PASSOU' : '❌ FALHOU'}`;
+  });
+  return output;
+})()}
 
 🎯 Resultado Final: ${overallResult ? '✅ REGRA APROVADA' : '❌ REGRA REJEITADA'}
 
@@ -782,39 +825,102 @@ ${testResults.map((result, index) => {
             </p>
 
             <div className="conditions-container">
-            {conditions.map((condition, index) => (
-              <div key={condition.id} className="condition-wrapper">
-                {index > 0 && (
-                  <div className="logical-operator-selector">
-                    <div className="logical-operator-label">Operador Lógico:</div>
-                    <div className="logical-buttons-group">
-                      <button
-                        type="button"
-                        className={`logical-btn ${condition.logicalOperator === 'AND' ? 'active' : ''}`}
-                        onClick={() => updateCondition(condition.id, 'logicalOperator', 'AND')}
-                        title="Todas as condições devem ser verdadeiras"
-                      >
-                        <span className="logical-btn-text">E</span>
-                        <span className="logical-btn-label">(AND)</span>
-                      </button>
-                      <button
-                        type="button"
-                        className={`logical-btn ${condition.logicalOperator === 'OR' ? 'active' : ''}`}
-                        onClick={() => updateCondition(condition.id, 'logicalOperator', 'OR')}
-                        title="Pelo menos uma condição deve ser verdadeira"
-                      >
-                        <span className="logical-btn-text">OU</span>
-                        <span className="logical-btn-label">(OR)</span>
-                      </button>
+            {(() => {
+              // Agrupar condições por campo
+              const conditionsByField = {};
+              conditions.forEach(condition => {
+                if (condition.field) {
+                  if (!conditionsByField[condition.field]) {
+                    conditionsByField[condition.field] = [];
+                  }
+                  conditionsByField[condition.field].push(condition);
+                }
+              });
+              
+              const fieldGroups = Object.keys(conditionsByField);
+              
+              return fieldGroups.map((field, fieldIndex) => {
+                const fieldConditions = conditionsByField[field];
+                const previousField = fieldIndex > 0 ? fieldGroups[fieldIndex - 1] : null;
+                const fieldOperator = fieldOperators[field] || 'AND';
+                
+                return (
+                  <div key={field} className="field-group-wrapper">
+                    {/* Operador lógico entre campos diferentes */}
+                    {fieldIndex > 0 && (
+                      <div className="field-logical-operator-selector">
+                        <div className="field-operator-label">Operador entre Campos:</div>
+                        <div className="logical-buttons-group">
+                          <button
+                            type="button"
+                            className={`logical-btn ${fieldOperator === 'AND' ? 'active' : ''}`}
+                            onClick={() => setFieldOperators({ ...fieldOperators, [field]: 'AND' })}
+                            title="Todas as condições deste campo E do campo anterior devem ser verdadeiras"
+                          >
+                            <span className="logical-btn-text">E</span>
+                            <span className="logical-btn-label">(AND)</span>
+                          </button>
+                          <button
+                            type="button"
+                            className={`logical-btn ${fieldOperator === 'OR' ? 'active' : ''}`}
+                            onClick={() => setFieldOperators({ ...fieldOperators, [field]: 'OR' })}
+                            title="Pelo menos uma condição deste campo OU do campo anterior deve ser verdadeira"
+                          >
+                            <span className="logical-btn-text">OU</span>
+                            <span className="logical-btn-label">(OR)</span>
+                          </button>
+                        </div>
+                        <div className="field-operator-info">
+                          <span className="field-operator-text">
+                            {previousField} <strong>{fieldOperator === 'AND' ? 'E' : 'OU'}</strong> {field}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Título do grupo de campo */}
+                    <div className="field-group-header">
+                      <h3 className="field-group-title">
+                        <span className="field-group-name">{field}</span>
+                        <span className="field-group-count">({fieldConditions.length} condição{fieldConditions.length > 1 ? 'ões' : ''})</span>
+                      </h3>
                     </div>
-                    <div className="logical-operator-connector">
-                      <span className="connector-line"></span>
-                    </div>
-                  </div>
-                )}
+                    
+                    {/* Condições do campo */}
+                    {fieldConditions.map((condition, conditionIndex) => (
+                      <div key={condition.id} className="condition-wrapper">
+                        {/* Operador lógico entre condições do mesmo campo */}
+                        {conditionIndex > 0 && (
+                          <div className="logical-operator-selector">
+                            <div className="logical-operator-label">Operador Lógico:</div>
+                            <div className="logical-buttons-group">
+                              <button
+                                type="button"
+                                className={`logical-btn ${condition.logicalOperator === 'AND' ? 'active' : ''}`}
+                                onClick={() => updateCondition(condition.id, 'logicalOperator', 'AND')}
+                                title="Todas as condições devem ser verdadeiras"
+                              >
+                                <span className="logical-btn-text">E</span>
+                                <span className="logical-btn-label">(AND)</span>
+                              </button>
+                              <button
+                                type="button"
+                                className={`logical-btn ${condition.logicalOperator === 'OR' ? 'active' : ''}`}
+                                onClick={() => updateCondition(condition.id, 'logicalOperator', 'OR')}
+                                title="Pelo menos uma condição deve ser verdadeira"
+                              >
+                                <span className="logical-btn-text">OU</span>
+                                <span className="logical-btn-label">(OR)</span>
+                              </button>
+                            </div>
+                            <div className="logical-operator-connector">
+                              <span className="connector-line"></span>
+                            </div>
+                          </div>
+                        )}
 
-                <div className="condition-row">
-                  <div className="condition-number">{index + 1}</div>
+                        <div className="condition-row">
+                          <div className="condition-number">{conditionIndex + 1}</div>
                   
                   <div className="condition-fields">
                     <div className="field-group">
@@ -1159,17 +1265,21 @@ ${testResults.map((result, index) => {
                     )}
                   </div>
 
-                  <button
-                    className="btn-remove"
-                    onClick={() => removeCondition(condition.id)}
-                    disabled={conditions.length === 1}
-                    title="Remover condição"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </div>
-              </div>
-            ))}
+                          <button
+                            className="btn-remove"
+                            onClick={() => removeCondition(condition.id)}
+                            disabled={fieldConditions.length === 1 && fieldGroups.length === 1}
+                            title="Remover condição"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              });
+            })()}
 
             </div>
           </div>
